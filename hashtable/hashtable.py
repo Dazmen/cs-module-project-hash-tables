@@ -7,6 +7,8 @@ class HashTableEntry:
         self.value = value
         self.next = None
 
+    def __str__(self):
+        return f'Key: {self.key}, Value: {self.value}'
 
 # Hash table can't have fewer than this many slots
 MIN_CAPACITY = 8
@@ -21,7 +23,11 @@ class HashTable:
     """
 
     def __init__(self, capacity):
-        # Your code here
+        self.capacity = capacity
+        self.storage = [None] * capacity
+
+    def __str__(self):
+        return f'This is the Hashtable Class {self.capacity}, {self.storage}'
 
 
     def get_num_slots(self):
@@ -34,7 +40,8 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        print('total slots', self.capacity)
+        return self.capacity
 
 
     def get_load_factor(self):
@@ -62,7 +69,12 @@ class HashTable:
 
         Implement this, and/or FNV-1.
         """
-        # Your code here
+
+        hash = 5381
+        for c in key:
+            hash = (hash * 33) + ord(c)
+        print(hash)
+        return hash
 
 
     def hash_index(self, key):
@@ -71,7 +83,7 @@ class HashTable:
         between within the storage capacity of the hash table.
         """
         #return self.fnv1(key) % self.capacity
-        return self.djb2(key) % self.capacity
+        return self.djb2(key) % len(self.storage)
 
     def put(self, key, value):
         """
@@ -81,7 +93,8 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        index = self.hash_index(key)
+        self.storage[index] = HashTableEntry(key, value)
 
 
     def delete(self, key):
@@ -92,7 +105,7 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        self.put(key, None)
 
 
     def get(self, key):
@@ -103,7 +116,11 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        index = self.hash_index(key)
+        if self.storage[index] is not None:
+            return self.storage[index].value
+        else:
+            return None
 
 
     def resize(self, new_capacity):
