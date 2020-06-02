@@ -51,7 +51,7 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        return self.stored_count / self.capacity
 
 
     def fnv1(self, key):
@@ -107,6 +107,7 @@ class HashTable:
             else: # If there is no key in the LL, add to the tail
                 node.next = HashTableEntry(key, value)
                 self.stored_count += 1
+                self.resize(self.capacity * 2)
 
         else: #if there is no value at the index
             self.storage[index] = HashTableEntry(key, value)
@@ -188,7 +189,34 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        # get load_ factor
+        # compare load_factor, if > 0.7 then
+        ## create new list doubling the current capacity 
+        ## set the new list as the current storage
+        ## iterate through current storage, re-hashing the nodes into the new list
+        # else: do nothing
+        if self.get_load_factor() > 0.7:
+            # declare new capacity/storage and reference the old storage
+            if new_capacity < self.capacity * 2:
+                new_capacity = self.capacity * 2
+
+            new_storage = [None] * new_capacity
+            old_storage = self.storage
+
+            # assign new capacity/storage to hashtable
+            self.capacity = new_capacity
+            self.storage = new_storage
+
+
+            for item in old_storage:
+                if item is not None:
+                    node = item
+                    while node is not None:
+                        self.put(node.key, node.value)
+                        node = node.next
+
+
+
 
 
 
