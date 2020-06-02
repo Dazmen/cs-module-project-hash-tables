@@ -11,7 +11,7 @@ class HashTableEntry:
         return f'Key: {self.key}, Value: {self.value}'
 
 # Hash table can't have fewer than this many slots
-MIN_CAPACITY = 8
+# MIN_CAPACITY = 8
 
 
 class HashTable:
@@ -23,8 +23,9 @@ class HashTable:
     """
 
     def __init__(self, capacity):
-        self.capacity = capacity
-        self.storage = [None] * capacity
+        self.capacity = max(8, capacity)
+        self.storage = [None] * max(8, capacity)
+        self.stored_count = 0
 
     def __str__(self):
         return f'This is the Hashtable Class {self.capacity}, {self.storage}'
@@ -73,7 +74,7 @@ class HashTable:
         hash = 5381
         for c in key:
             hash = (hash * 33) + ord(c)
-        print(hash)
+
         return hash
 
 
@@ -94,7 +95,22 @@ class HashTable:
         Implement this.
         """
         index = self.hash_index(key)
-        self.storage[index] = HashTableEntry(key, value)
+        if self.storage[index] is not None: # if there is a value at the index
+            node = self.storage[index]
+           
+            while node.key != key and node.next is not None:
+                node = node.next # this will loop through the LL and find the node with matching keys
+
+            if node.key == key: # updating the existing key with new value
+                node.value = value
+                
+            else: # If there is no key in the LL, add to the tail
+                node.next = HashTableEntry(key, value)
+                self.stored_count += 1
+
+        else: #if there is no value at the index
+            self.storage[index] = HashTableEntry(key, value)
+            self.stored_count += 1
 
 
     def delete(self, key):
@@ -105,7 +121,35 @@ class HashTable:
 
         Implement this.
         """
-        self.put(key, None)
+        index = self.hash_index(key)
+
+        if self.storage[index] is None: # if the key is not in the hashtable
+            return None
+
+        elif self.storage[index].next is None: # if only the head is present at the index
+            removed_value = self.storage[index].value
+            self.storage[index] = None
+            self.stored_count -= 1
+            return removed_value
+
+        else: # indicating more than the head of a LL
+            node = self.storage[index]
+            prev = None
+
+            while node.key != key and node.next is not None: # loop through array until key matches or not found
+                prev = node
+                node = node.next
+
+            if node.key == key: # if key's match move prev pointer to next, return the removed value
+                prev.next = node.next
+                removed_value = node.value
+                node = None
+                self.stored_count -= 1
+                return removed_value
+            else: # means that the key was not found in the LL
+                return None
+
+        
 
 
     def get(self, key):
@@ -117,10 +161,24 @@ class HashTable:
         Implement this.
         """
         index = self.hash_index(key)
-        if self.storage[index] is not None:
-            return self.storage[index].value
-        else:
+
+        if self.storage[index] is None: # if key is not in hashtable
             return None
+
+        elif self.storage[index].next is not None: # checking for LL
+            node = self.storage[index]
+
+            while node.key != key and node.next is not None: # iterating through LL to find the key
+                node = node.next
+
+            if node.key == key:
+                return node.value
+
+            else: # no key matching in LL
+                return None
+
+        else: # returns value at hashed index
+            return self.storage[index].value
 
 
     def resize(self, new_capacity):
