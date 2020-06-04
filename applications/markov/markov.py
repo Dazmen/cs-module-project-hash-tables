@@ -1,5 +1,7 @@
 import random
 
+###### RETURN TO THIS REGEX NIGHTMARE LATER
+
 # Read in all the words in one go
 with open("input.txt") as f:
     words = f.read()
